@@ -9,3 +9,7 @@ Sample contracts for AnnChain.
 | Fungible Token     | FT        |
 | Non-Fungible Token | NFT       |
 
+## Multisig
+| Contact Type       | File Name |
+| ------------------ | --------- |
+| Multisignature     | Multisig  |
