@@ -11,6 +11,7 @@ import (
 
 	cmn "github.com/dappledger/AnnChain/cmd/client/commands"
 	"github.com/dappledger/AnnChain/eth/accounts/abi"
+	"github.com/dappledger/AnnChain/eth/crypto"
 	"github.com/dappledger/AnnChain/eth/params"
 	. "github.com/dappledger/ann-contracts/evm/client"
 	. "github.com/dappledger/ann-contracts/evm/vm"
@@ -24,23 +25,28 @@ const (
 	EVMGasLimit uint64 = 100000000
 )
 
-var inputData = []interface{}{"id", "name", "phoneNo", 168}
+var (
+	inputData          = []interface{}{"id", "name", "phoneNo", 168}
+	senderNonce uint64 = 3
+)
 
 var evmConfig = Config{EVMGasLimit: EVMGasLimit}
 
 func TestCreateCon(t *testing.T) {
 	evm := NewEVM(Context{}, nil, params.MainnetChainConfig, evmConfig)
 
-	sender := AccountRef(StringToAddr(SenderAddr))
+	addr := StringToAddr(SenderAddr)
+	sender := AccountRef(addr)
 
 	abiJson, err := abi.JSON(strings.NewReader(conAbi))
 	assert.Nil(t, err)
 	data, err := CreateContractData(abiJson, byteCode, nil)
 	assert.Nil(t, err)
-	_, conAddr, _, err := evm.Create(sender, data, 0, big.NewInt(0))
+	_, _, _, err = evm.Create(sender, data, 0, big.NewInt(0))
 	assert.Nil(t, err)
 
-	fmt.Println("contract address:", conAddr.String())
+	contractAddr := crypto.CreateAddress(addr, senderNonce)
+	fmt.Println("contract address:", contractAddr.String())
 }
 
 func TestCallCon(t *testing.T) {
